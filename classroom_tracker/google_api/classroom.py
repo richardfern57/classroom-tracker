@@ -168,5 +168,5 @@ class ClassroomConnector(GoogleApiConnector):
                 'first_name': user.get('givenName'),
                 'last_name': user.get('familyName'),
                 'full_name': user.get('fullName')}],
-            index=pandas.Index([user_id], name='user_id')
+            index=pandas.Index([str(user_id)], name='user_id')
         )

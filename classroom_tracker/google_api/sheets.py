@@ -68,3 +68,23 @@ class SheetsConnector(GoogleApiConnector):
 
         updates = result.get('updatedCells')
         self.logger.info(f'{updates} cells updated in {spreadsheet_id}')
+
+    def add_sheet(self, spreadsheet_id, sheet_name):
+        """Add a new sheet to the spreadsheet
+
+        Parameters
+        ----------
+        spreadsheet_id : str
+            The ID of the spreadsheet
+        sheet_name : str
+            The name to give the new sheet
+        """
+        request = {'addSheet': {'properties': {'title': sheet_name}}}
+
+        (
+            self.service.spreadsheets()
+            .batchUpdate(
+                spreadsheetId=spreadsheet_id,
+                body={'requests': [request]})
+            .execute()
+        )
