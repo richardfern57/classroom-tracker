@@ -38,11 +38,16 @@ class Tracker:
             except IndexError:
                 pass
 
-            submissions = (
-                self.get_submissions(course_id)
-                .reset_index()
-            )
-            print(submissions)
+            submissions = self.get_submissions(course_id).reset_index()
+            columns = [submissions.columns.tolist()]
+            values = submissions.fillna('').astype(str).values.tolist()
+            upload = columns + values
+
+            self.sheets.write_data(
+                self.spreadsheet_id,
+                name,
+                upload,
+                mode='USER_ENTERED')
 
     def get_submissions(self, course_id):
         """Get the submissions results for a particular course_id
@@ -58,7 +63,7 @@ class Tracker:
             A dataframe indexed by group, name and metric where the column are
             the coursework names
         """
-        courseworks = self.classrooms.get_courseworks(course_id).iloc[:2]
+        courseworks = self.classrooms.get_courseworks(course_id)
 
         submissions = pandas.concat([
             self.classrooms.get_submissions(course_id, coursework_id)
@@ -71,7 +76,7 @@ class Tracker:
 
         return (
             submissions
-            .drop(columns=['user_id'])
-            .set_index(['group', 'name', 'metric', 'course'])
-            .unstack(level=3)['value']
+            .set_index(['group', 'user_id', 'name', 'metric', 'course'])
+            .unstack(level='course')['value']
+            .droplevel('user_id')
         )
