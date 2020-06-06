@@ -12,6 +12,8 @@ class GoogleApiAccessError(Exception):
 
 
 class GoogleApiConnector:
+    """A generic connector to a Google API, wrapping the necessary
+    authorisation"""
 
     _scopes = []
     _service = None

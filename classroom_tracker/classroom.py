@@ -5,6 +5,7 @@ from .api import GoogleApiConnector
 
 
 class ClassroomConnector(GoogleApiConnector):
+    """Connector to the Google Classrooms API"""
 
     _scopes = [
         'https://www.googleapis.com/auth/classroom.courses.readonly',
