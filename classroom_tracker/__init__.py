@@ -1,2 +1,1 @@
-from .classroom import ClassroomConnector
-from .sheets import SheetsConnector
+from . import google_api
