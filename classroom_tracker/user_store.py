@@ -41,14 +41,14 @@ class UserStore:
         pandas.Series
             A series of formatted names
         """
-        names = [
-            name.lower().replace(', ', ' ')
-            for name in self.mappings['formatted_name']]
+        names = self.mappings['formatted_name']
+        match_names = [name.lower().replace(',', '') for name in names]
+        lookup = pandas.Series(names, index=match_names)
 
         def get_close_name(name):
-            name = name.lower().replace(', ', ' ')
-            match = difflib.get_close_matches(name, names, n=1)
-            return match[0] if len(match) > 0 else f'{name} (???)'
+            match_name = name.lower().replace(',', '')
+            match = difflib.get_close_matches(match_name, match_name, n=1)
+            return lookup[match[0]] if len(match) > 0 else f'{name} (???)'
 
         return (
             user_ids
