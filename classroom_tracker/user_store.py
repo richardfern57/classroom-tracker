@@ -43,7 +43,7 @@ class UserStore:
         """
         names = self.mappings['formatted_name']
         match_names = [name.lower().replace(',', '') for name in names]
-        lookup = pandas.Series(names, index=match_names)
+        lookup = pandas.Series(names.tolist(), index=match_names)
 
         def get_close_name(name):
             match_name = name.lower().replace(',', '')
