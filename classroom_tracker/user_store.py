@@ -47,7 +47,7 @@ class UserStore:
 
         def get_close_name(name):
             match_name = name.lower().replace(',', '')
-            match = difflib.get_close_matches(match_name, match_name, n=1)
+            match = difflib.get_close_matches(match_name, match_names, n=1)
             return lookup[match[0]] if len(match) > 0 else f'{name} (???)'
 
         return (
