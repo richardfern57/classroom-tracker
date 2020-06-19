@@ -10,7 +10,8 @@ class ClassroomConnector(GoogleApiConnector):
     _scopes = [
         'https://www.googleapis.com/auth/classroom.courses.readonly',
         'https://www.googleapis.com/auth/classroom.student-submissions.students.readonly',
-        'https://www.googleapis.com/auth/classroom.rosters.readonly'
+        'https://www.googleapis.com/auth/classroom.rosters.readonly',
+        'https://www.googleapis.com/auth/classroom.profile.emails'
     ]
     _service = 'classroom'
     _version = 'v1'
@@ -142,31 +143,39 @@ class ClassroomConnector(GoogleApiConnector):
                 for sub in submissions],
             index=index)
 
-    def get_user(self, user_id):
-        """Get the details for a particular user
+    def get_students(self, course_id):
+        """Get all the student details for a particular course
 
         Parameters
         ----------
-        user_id : int
-            The id of the user
+        course_id : str
+            The ID of the course to get details for
 
         Returns
         -------
         pandas.DataFrame
-            A single-row DataFrame indexed by user_id
+            The students indexed by user_id, with columns first_name,
+            last_name, full_name and email
         """
-        user = (
+        students = (
             self.service
-            .userProfiles()
-            .get(userId=user_id)
+            .courses()
+            .students()
+            .list(courseId=course_id)
             .execute()
-            .get('name')
+            .get('students')
         )
 
-        return pandas.DataFrame(
-            [{
-                'first_name': user.get('givenName'),
-                'last_name': user.get('familyName'),
-                'full_name': user.get('fullName')}],
-            index=pandas.Index([str(user_id)], name='user_id')
+        return (
+            pandas.DataFrame(students)
+            .assign(
+                name=lambda d: d['profile'].str['name'],
+                first_name=lambda d: d['name'].str['givenName'],
+                last_name=lambda d: d['name'].str['familyName'],
+                full_name=lambda d: d['name'].str['fullName'],
+                email=lambda d: d['profile'].str['emailAddress']
+            )
+            .drop(columns=['courseId', 'profile', 'name'])
+            .rename(columns={'userId': 'user_id'})
+            .set_index('user_id')
         )
