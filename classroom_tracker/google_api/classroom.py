@@ -157,14 +157,22 @@ class ClassroomConnector(GoogleApiConnector):
             The students indexed by user_id, with columns first_name,
             last_name, full_name and email
         """
-        students = (
-            self.service
-            .courses()
-            .students()
-            .list(courseId=course_id)
-            .execute()
-            .get('students')
-        )
+        students = []
+        token = {}
+        while True:
+            page = (
+                self.service
+                .courses()
+                .students()
+                .list(courseId=course_id, pageSize=0, **token)
+                .execute()
+            )
+            students += page.get('students', [])
+
+            if 'nextPageToken' in page.keys():
+                token['pageToken'] = page['nextPageToken']
+            else:
+                break
 
         return (
             pandas.DataFrame(students)
