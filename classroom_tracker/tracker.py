@@ -36,7 +36,7 @@ class Tracker:
                 self.sheets.get_data(self.spreadsheet_id, name)
             except googleapiclient.errors.HttpError:
                 self.sheets.add_sheet(self.spreadsheet_id, name)
-            except IndexError:
+            except (IndexError, ValueError):
                 pass
 
             submissions = self.get_submissions(course_id).reset_index()
