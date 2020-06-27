@@ -90,7 +90,8 @@ class ClassroomConnector(GoogleApiConnector):
             A timestamp for the last turn-in action
         """
         history = submission.get('submissionHistory', [])
-        history = [item.get('stateHistory', []) for item in history]
+        history = [
+            item.get('stateHistory', {'state': None}) for item in history]
         history = [item for item in history if item['state'] == 'TURNED_IN']
         times = [
             pandas.Timestamp(turn_in['stateTimestamp'])
